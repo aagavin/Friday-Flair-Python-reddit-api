@@ -1,7 +1,4 @@
 #!/usr/bin/env python2.7
-#
-#
-#
 #############################
 import reddit
 from operator import itemgetter, attrgetter
@@ -11,10 +8,11 @@ topcomments=list()
 r = reddit.Reddit(user_agent='aagavin_script')
 r.login('<user>', '<password>')
 #submissions = r.get_subreddit('shittyaskscience').get_top(limit=5, url_data={'t': 'week'})
-submissions = r.get_subreddit('shittyaskscience').get_top(limit=None, url_data={'t': 'week'})
+submissions = r.get_subreddit('sasmodroom').get_top(limit=None, url_data={'t': 'week'})
 #############################
 
-print 'Top post of the week:\n[%s][%s](%s){%s comments} by [%s](http://www.reddit/u/%s)' % (submissions[0].ups-submissions[0].downs, submissions[0].title, submissions[0].url,submissions[0].num_comments, submissions[0].author, submissions[0].author)
+for i in submissions:
+	print 'Top post of the week:\n[%s][%s](%s){%s comments} by [%s[%s]](http://www.reddit/u/%s)' % (i.ups-i.downs, i.title, i.url,i.num_comments, i.author,i.author_flair_text, i.author)
 
 for i in submissions:
 	try:
