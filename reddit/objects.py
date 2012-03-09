@@ -482,8 +482,7 @@ class Submission(Approvable, Deletable, Distinguishable, Reportable, Saveable,
         submission.comments = c_info['data']['children']
         return submission
 
-    def _add_comment(self, comment):
-        assert len(comment.replies) == 0
+    def _insert_comment(self, comment):
         if comment.name in self._comments_by_id:  # Skip existing comments
             return
 
@@ -537,7 +536,11 @@ class Submission(Approvable, Deletable, Distinguishable, Reportable, Saveable,
                         comment._update_submission(self)
                         queue.insert(0, (0, comment))
                     else:
-                        self._add_comment(comment)
+                        # pylint: disable-msg=W0212
+                        assert not comment._replies
+                        # Replies needs to be an empty list
+                        comment._replies = []
+                        self._insert_comment(comment)
             else:
                 [queue.append((comm, x)) for x in comm.replies]
 
@@ -584,8 +587,8 @@ class Submission(Approvable, Deletable, Distinguishable, Reportable, Saveable,
     @property
     def comments_flat(self):
         if not self._comments_flat:
-            self._comments_flat = []
             stack = self.comments[:]
+            self._comments_flat = []
             while len(stack) > 0:
                 comment = stack.pop(0)
                 assert(comment not in self._comments_flat)
