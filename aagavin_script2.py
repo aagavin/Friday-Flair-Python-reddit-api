@@ -37,47 +37,80 @@ class FridayFlair:
   #This will get the top post of the week post it and give will gold flair
   #it will also get the top comment in the top post and give it silver flair!
   def getTopPost(self):
+		#gets the top post of the week in the givin subreddit
     topPost = self.r.get_subreddit(self.thesub).get_top(limit=1, url_data={'t': 'week'})
-    for i in topPost:
-      if i.author_flair_text==None:
-        self.r.get_subreddit(self.thesub).set_flair(i.author, 'I have no flair', '1')
-      else:
-        self.r.get_subreddit(self.thesub).set_flair(i.author, i.author_flair_text, '1')
-      self.post='Top post of the week(gold flair):\n\n---\n\n[%s][%s](%s){[%s comments](%s)} by [%s[%s]](http://www.reddit/u/%s)\n\n\n\n' % (i.ups-i.downs, i.title, i.url,i.num_comments,i.permalink, i.author,i.author_flair_text, i.author)
-      self.post=self.post+'\n\n\n\nTop Comment of the week(silver flair):\n\n---\n\n[%s][%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (i.comments_flat[0].ups-i.comments_flat[0].downs,i.comments_flat[0],i.comments_flat[0].permalink,i.comments_flat[0].author,i.comments_flat[0].author)
-      if i.comments_flat[0].author_flair_text==None:
-        self.r.get_subreddit(self.thesub).set_flair(i.comments_flat[0].author, 'I have no flair', '2')
-      else:
-        self.r.get_subreddit(self.thesub).set_flair(i.comments_flat[0].author, i.author_flair_text, '2')
+    topPost = topPost.next()
+    
+    
+    #Checks to see if the author of the post has flair
+    #if not it gives the author a flair of "I have no flair"
+    if topPost.author_flair_text==None:
+			try:
+				self.r.get_subreddit(self.thesub).set_flair(topPost.author, 'I have no flair', '1')
+			except:
+				print "There was an error(are you sure your mod?), continuing..."
+    else:
+			try:
+				self.r.get_subreddit(self.thesub).set_flair(topPost.author, topPost.author_flair_text, '1')
+			except:
+				print "There was an error(are you sure your mod?), continuing..."
+    
+    #Checks to see if the author of the top comment has flair
+    #if not it gives the author a flair of "I have no flair"
+    if topPost.comments_flat[0].author_flair_text==None:
+			try:
+				self.r.get_subreddit(self.thesub).set_flair(topPost.comments_flat[0].author, 'I have no flair', '2')
+			except:
+				print "again you don't have mod access to this subreddit, thats cool no problem I'll just not set flair"
+    else:
+			try:
+				self.r.get_subreddit(self.thesub).set_flair(topPost.comments_flat[0].author, topPost.author_flair_text, '2')
+			except:
+				print "again you don't have mod access to this subreddit, thats cool no problem I'll just not set flair"
+    
+    #adds the top post and top coment
+    #to var post that is later posted out
+    self.post='Top post of the week(gold flair):\n\n---\n\n[%s][%s](%s){[%s comments](%s)} by [%s[%s]](http://www.reddit/u/%s)\n\n\n\n' % (topPost.ups-topPost.downs, topPost.title, topPost.url,topPost.num_comments,topPost.permalink, topPost.author,topPost.author_flair_text, topPost.author)
+    self.post=self.post+'\n\n\n\nTop Comment of the week(silver flair):\n\n---\n\n[%s][%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (topPost.comments_flat[0].ups-topPost.comments_flat[0].downs,topPost.comments_flat[0],topPost.comments_flat[0].permalink,topPost.comments_flat[0].author,topPost.comments_flat[0].author)
+    
 
 
   # The name should explain it self
   def getTopComments(self):
-    submissions = self.r.get_subreddit(self.thesub).get_top(limit=None, url_data={'t': 'week'})
+		#gets all the comments form the top posts of the week
+		#and sorts them by votes(upvotes-downvotes)
+    submissions = self.r.get_subreddit(self.thesub).get_top(limit=100, url_data={'t': 'week'})
+    print 'sorting comments(This could take some time) ...',
     for i in submissions:
-      for j in i.all_comments_flat:
-        try:
-          if (datetime.now() - datetime.fromtimestamp(j.created)).days < 7 and j.ups>15:
-            #print '[%s]%s' %(j.ups-j.downs, j)
-            self.topcomments.insert(0,[j,j.ups-j.downs])
-          #dtime = datetime.fromtimestamp(j.created)
-        except AttributeError:
-          continue
+			print '.',
+			for j in i.all_comments_flat:
+				if (datetime.now() - datetime.fromtimestamp(j.created)).days < 7 and j.ups>15:
+					self.topcomments.insert(0,[j,j.ups-j.downs])
+    #The magic of python will now sort the comments
     self.topcomments=sorted(self.topcomments, key=itemgetter(1), reverse=True)
     self.post=self.post+'\n\n\n\nTop Comments of the week:\n\n---\n\n'
-    for j in self.topcomments[0:10]:
-      self.post=self.post+'\n[%s][%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (j[0].ups-j[0].downs,j[0],j[0].permalink,j[0].author,j[0].author)
-
-
+    top10=self.topcomments[0:10]
+    for j in top10:
+			#self.post=self.post+'[%d][%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (j[0].ups-j[0].downs,j[0],j[0].permalink,j[0].author,j[0].author)
+			self.post=self.post+'['u'%s''](%s) by [%s](http://www.reddit.com/u/%s)\n' % (j[0],j[0].permalink,j[0].author,j[0].author)
+			
+			
+			
   #This will post it to the subreddit
   def postToSub(self):
-    self.r.submit(self.thesub, '[Announcement] Friday Flair Awards', text=self.post)
-    self.r.logout()
+		print 'done'
+		ans=raw_input("OK. Done do you want to post to r/%s?: ")
+		if ans=='yes' or ans=='y' or ans=='YES':
+			self.r.submit(self.thesub, '[Announcement] Friday Flair Awards', text=self.post)
+		else:
+			print "Ok cool I'll show it here than"
+			print self.post
+		self.r.logout()
 
 u=raw_input("Enter your username: ")
 p=getpass.getpass("Enter your password: ")
-s=raw_input("Enter your subreddit: ")
+s=raw_input("Enter your subreddit: r/")
 friday=FridayFlair(u,p,s)
-friday.getTopPost()
+#friday.getTopPost()
 friday.getTopComments()
 friday.postToSub()
