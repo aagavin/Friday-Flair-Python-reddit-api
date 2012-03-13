@@ -92,14 +92,19 @@ class FridayFlair:
     top10=self.topcomments[0:10]
     for j in top10:
 			#self.post=self.post+'[%d][%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (j[0].ups-j[0].downs,j[0],j[0].permalink,j[0].author,j[0].author)
-			self.post=self.post+'['u'%s''](%s) by [%s](http://www.reddit.com/u/%s)\n' % (j[0],j[0].permalink,j[0].author,j[0].author)
+			try:
+				self.post=self.post+'1. [%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (j[0].ups-j[0].downs,j[0],j[0].permalink,j[0].author,j[0].author)
+			except UnicodeDecodeError:
+				continue
+			except TypeError:
+				continue
 			
 			
 			
   #This will post it to the subreddit
   def postToSub(self):
 		print 'done'
-		ans=raw_input("OK. Done do you want to post to r/%s?: ")
+		ans=raw_input("OK. Done do you want to post to r/"+self.thesub+"?: ")
 		if ans=='yes' or ans=='y' or ans=='YES':
 			self.r.submit(self.thesub, '[Announcement] Friday Flair Awards', text=self.post)
 		else:
