@@ -31,7 +31,9 @@ class FridayFlair:
     self.topcomments  =list()
     self.r            =reddit.Reddit(user_agent='aagavin_script')
     self.r.login(username,password)
-    self.post=''
+    self.topweekpost=''
+    self.topweekcomment=''
+    self.comments=''
 
 
   #This will get the top post of the week post it and give will gold flair
@@ -69,9 +71,9 @@ class FridayFlair:
 				print "again you don't have mod access to this subreddit, thats cool no problem I'll just not set flair"
     
     #adds the top post and top coment
-    #to var post that is later posted out
-    self.post='Top post of the week(gold flair):\n\n---\n\n[%s][%s](%s){[%s comments](%s)} by [%s[%s]](http://www.reddit/u/%s)\n\n\n\n' % (topPost.ups-topPost.downs, topPost.title, topPost.url,topPost.num_comments,topPost.permalink, topPost.author,topPost.author_flair_text, topPost.author)
-    self.post=self.post+'\n\n\n\nTop Comment of the week(silver flair):\n\n---\n\n[%s][%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (topPost.comments_flat[0].ups-topPost.comments_flat[0].downs,topPost.comments_flat[0],topPost.comments_flat[0].permalink,topPost.comments_flat[0].author,topPost.comments_flat[0].author)
+    #to a var that is later posted out
+    self.topweekpost='[%s][%s](%s){[%s comments](%s)} by [%s[%s]](http://www.reddit/u/%s)\n\n\n\n' % (topPost.ups-topPost.downs, topPost.title, topPost.url,topPost.num_comments,topPost.permalink, topPost.author,topPost.author_flair_text, topPost.author)
+    self.topweekcomment='(\n\n---\n\n[%s][%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (topPost.comments_flat[0].ups-topPost.comments_flat[0].downs,topPost.comments_flat[0],topPost.comments_flat[0].permalink,topPost.comments_flat[0].author,topPost.comments_flat[0].author)
     
 
 
@@ -79,8 +81,8 @@ class FridayFlair:
   def getTopComments(self):
 		#gets all the comments form the top posts of the week
 		#and sorts them by votes(upvotes-downvotes)
-    submissions = self.r.get_subreddit(self.thesub).get_top(limit=100, url_data={'t': 'week'})
-    print 'sorting comments(This could take some time) ...',
+    submissions = self.r.get_subreddit(self.thesub).get_top(limit=75, url_data={'t': 'week'})
+    print 'sorting comments(This could take some time) . . . ',
     for i in submissions:
 			print '.',
 			for j in i.all_comments_flat:
@@ -91,22 +93,21 @@ class FridayFlair:
     self.post=self.post+'\n\n\n\nTop Comments of the week:\n\n---\n\n'
     top10=self.topcomments[0:10]
     for j in top10:
-			#self.post=self.post+'[%d][%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (j[0].ups-j[0].downs,j[0],j[0].permalink,j[0].author,j[0].author)
-			try:
-				self.post=self.post+'1. [%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (j[0].ups-j[0].downs,j[0],j[0].permalink,j[0].author,j[0].author)
-			except UnicodeDecodeError:
-				continue
-			except TypeError:
-				continue
-			
+			self.comments+='1. [%s](%s) by [%s](http://www.reddit.com/u/%s)\n' % (j[0].ups-j[0].downs,j[0],j[0].permalink,j[0].author,j[0].author)
+		
 			
 			
   #This will post it to the subreddit
   def postToSub(self):
 		print 'done'
 		ans=raw_input("OK. Done do you want to post to r/"+self.thesub+"?: ")
-		if ans=='yes' or ans=='y' or ans=='YES':
-			self.r.submit(self.thesub, '[Announcement] Friday Flair Awards', text=self.post)
+		if ans=='yes' or ans=='y' or ans=='YES' or ans=='Y':
+			body=	'Top Post of the week:'
+			body+=self.topweekpost
+			body+='Top comment in the top post:'
+			body+=self.topweekcomment
+			print body
+			#self.r.submit(self.thesub, '[Announcement] Friday Flair Awards', text=self.post)
 		else:
 			print "Ok cool I'll show it here than"
 			print self.post
@@ -116,6 +117,6 @@ u=raw_input("Enter your username: ")
 p=getpass.getpass("Enter your password: ")
 s=raw_input("Enter your subreddit: r/")
 friday=FridayFlair(u,p,s)
-#friday.getTopPost()
+friday.getTopPost()
 friday.getTopComments()
 friday.postToSub()
