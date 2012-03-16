@@ -80,7 +80,7 @@ class FridayFlair:
   def getTopComments(self):
     #gets all the comments form the top posts of the week
     #and sorts them by votes(upvotes-downvotes)
-    submissions = self.r.get_subreddit(self.thesub).get_top(limit=1, url_data={'t': 'week'})
+    submissions = self.r.get_subreddit(self.thesub).get_top(limit=50, url_data={'t': 'week'})
     print 'sorting comments(This could take some time) . . . ',
     for i in submissions:
       print '.',
