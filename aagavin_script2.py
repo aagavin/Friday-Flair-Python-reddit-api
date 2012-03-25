@@ -39,6 +39,13 @@ class FridayFlair:
   #This will get the top post of the week post it and give will gold flair
   #it will also get the top comment in the top post and give it silver flair!
   def getTopPost(self):
+		#removes current gold and silver flair
+		item = self.r.get_subreddit(self.thesub).flair_list()
+		for i in item:
+			if i['flair_css_class']=="1" or i['flair_css_class']=="2":
+				self.r.get_subreddit(self.thesub).set_flair(i['user'], i['flair_text'], None)
+				
+		
     #gets the top post of the week in the givin subreddit
     topPost = self.r.get_subreddit(self.thesub).get_top(limit=1, url_data={'t': 'week'})
     topPost = topPost.next()
@@ -48,12 +55,14 @@ class FridayFlair:
     #if not it gives the author a flair of "I have no flair"
     if topPost.author_flair_text==None:
       try:
-        '''self.r.get_subreddit(self.thesub).set_flair(topPost.author, 'I have no flair', '1')'''
+        self.r.get_subreddit(self.thesub).set_flair(topPost.author, 'I have no flair', '1')
+        self.r.compose_message(topPost.author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
       except:
         print "There was an error(are you sure your mod?), continuing..."
     else:
       try:
-        '''self.r.get_subreddit(self.thesub).set_flair(topPost.author, topPost.author_flair_text, '1')'''
+        self.r.get_subreddit(self.thesub).set_flair(topPost.author, topPost.author_flair_text, '1')
+        self.r.compose_message(topPost.author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
       except:
         print "There was an error(are you sure your mod?), continuing..."
 	
@@ -62,11 +71,13 @@ class FridayFlair:
     if topPost.comments_flat[0].author_flair_text==None:
       try:
         self.r.get_subreddit(self.thesub).set_flair(topPost.comments_flat[0].author, 'I have no flair', '2')
+        self.r.compose_message(topPost.comments_flat[0].author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
       except:
         print "again you don't have mod access to this subreddit, thats cool no problem I'll just not set flair"
     else:
       try:
         self.r.get_subreddit(self.thesub).set_flair(topPost.comments_flat[0].author, topPost.author_flair_text, '2')
+        self.r.compose_message(topPost.comments_flat[0].author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
       except:
         print "again you don't have mod access to this subreddit, thats cool no problem I'll just not set flair"
     
@@ -80,8 +91,8 @@ class FridayFlair:
   def getTopComments(self):
     #gets all the comments form the top posts of the week
     #and sorts them by votes(upvotes-downvotes)
-    submissions = self.r.get_subreddit(self.thesub).get_top(limit=50, url_data={'t': 'week'})
-    print 'sorting comments(This could take some time) . . . ',
+    submissions = self.r.get_subreddit(self.thesub).get_top(limit=45, url_data={'t': 'week'})
+    print 'sorting comments(This could take some time) . . .',
     for i in submissions:
       print '.',
       for j in i.all_comments_flat:
@@ -92,7 +103,6 @@ class FridayFlair:
     self.topcomments=sorted(self.topcomments, key=itemgetter(1), reverse=True)
     top10=self.topcomments[0:10]
     for j in top10:
-      #self.comments+='1. [%d][%s](%s) by [%s]\n\n' % (j[0].ups-j[0].downs,str(j[0]),j[0].permalink,j[0].author)
       self.comments+='1. [%s](%s) by %s, [%s points]\n\n' % (str(j[0]),j[0].permalink,j[0].author,j[0].ups-j[0].downs)
 
 
@@ -101,21 +111,17 @@ class FridayFlair:
   def postToSub(self):
     print 'done'
     ans=raw_input("OK. Done do you want to post to r/"+self.thesub+"?: ")
+    body='intro para stuff'
+    body+='\n\n---\n\n'
+    body+='**Top Post of the week(gold flair):**\n\n'
+    body+=self.topweekpost+'\n\n'
+    body+='**Top comment in the top post(silver flair):**\n\n'
+    body+=self.topweekcomment+'\n\n'
+    body+='**Most voted on comment in last weeks thread(gold flair):**\n\n'
+    body+='* Insert some stuff here\n\n'
+    body+='**Top ten comments**\n\n'
+    body+=self.comments
     if ans=='yes' or ans=='y' or ans=='YES' or ans=='Y':
-      body='intro para stuff'
-      body+='\n\n---\n\n'
-      body+='**Top Post of the week(gold flair):**\n\n'
-      body+=self.topweekpost+'\n\n'
-      body+='**Top comment in the top post(silver flair):**\n\n'
-      body+=self.topweekcomment+'\n\n'
-      body+='**Most voted on comment in last weeks thread(gold flair):**\n\n'
-      body+='* Insert some stuff here\n\n'
-      body+='**Top ten comments**\n\n'
-      body+=self.comments
-      body+='\n\n---\n\n'
-      body+='> Optional closing comments'
-      body+='\n\n---\n\n'
-      #print body
       self.r.submit(self.thesub, '[Announcement] Friday Flair Awards', text=body)
       #self.r.submit('SaSModRoom', '(testing)[Announcement] Friday Flair Awards', text=body)
     else:
