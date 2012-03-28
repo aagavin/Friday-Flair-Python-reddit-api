@@ -26,10 +26,11 @@ yea kinda messyish right now
 #class FridayFlair=boss
 class FridayFlair:
   '''yea let declair some variables '''
-  def __init__(self,username, password, thesubreddityouwant): 
-    self.thesub       = thesubreddityouwant
-    self.topcomments  =list()
-    self.r            =reddit.Reddit(user_agent='aagavin_script')
+  def __init__(self,username, password, thesubreddityouwant):
+		self.r=reddit.Reddit(user_agent='aagavin_script')
+		self.thesub=r.get_subreddit(thesubreddityouwant) 
+    #self.thesub=thesubreddityouwant
+    self.topcomments=list()
     self.r.login(username,password)
     self.topweekpost=''
     self.topweekcomment=''
@@ -39,15 +40,16 @@ class FridayFlair:
   #This will get the top post of the week post it and give will gold flair
   #it will also get the top comment in the top post and give it silver flair!
   def getTopPost(self):
+		
 		#removes current gold and silver flair
-		item = self.r.get_subreddit(self.thesub).flair_list()
+		item =self.thesub.flair_list()
 		for i in item:
 			if i['flair_css_class']=="1" or i['flair_css_class']=="2":
 				self.r.get_subreddit(self.thesub).set_flair(i['user'], i['flair_text'], None)
 				
 		
     #gets the top post of the week in the givin subreddit
-    topPost = self.r.get_subreddit(self.thesub).get_top(limit=1, url_data={'t': 'week'})
+    topPost = self.thesub.get_top(limit=1, url_data={'t': 'week'})
     topPost = topPost.next()
     
     
@@ -91,7 +93,7 @@ class FridayFlair:
   def getTopComments(self):
     #gets all the comments form the top posts of the week
     #and sorts them by votes(upvotes-downvotes)
-    submissions = self.r.get_subreddit(self.thesub).get_top(limit=45, url_data={'t': 'week'})
+    submissions =self.thesub.get_top(limit=45, url_data={'t': 'week'})
     print 'sorting comments(This could take some time) . . .',
     for i in submissions:
       print '.',
