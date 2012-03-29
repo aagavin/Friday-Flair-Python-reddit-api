@@ -20,9 +20,6 @@ import getpass
 from datetime import datetime
 from operator import itemgetter, attrgetter
 
-'''
-yea kinda messyish right now
-'''
 #class FridayFlair=boss
 class FridayFlair:
   '''yea let declair some variables '''
