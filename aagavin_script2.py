@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 #
 '''
 The shitty ask science friday flair award script
@@ -26,7 +26,7 @@ class FridayFlair:
   '''yea let declair some variables '''
   def __init__(self,username, password, thesubreddityouwant):
   	self.r=reddit.Reddit(user_agent='aagavin_script')
-  	self.thesub=r.get_subreddit(thesubreddityouwant)
+  	self.thesub=self.r.get_subreddit(thesubreddityouwant)
   	#self.thesub=thesubreddityouwant
   	self.topcomments=list()
   	self.r.login(username,password)
@@ -42,7 +42,7 @@ class FridayFlair:
   	item =self.thesub.flair_list()
   	for i in item:
   		if i['flair_css_class']=="1" or i['flair_css_class']=="2":
-  			self.r.get_subreddit(self.thesub).set_flair(i['user'], i['flair_text'], None)
+  			(self.thesub).set_flair(i['user'], i['flair_text'], None)
   	
   	
   	#gets the top post of the week in the givin subreddit
@@ -55,13 +55,13 @@ class FridayFlair:
   	if topPost.author_flair_text==None:
   		try:
   			self.r.get_subreddit(self.thesub).set_flair(topPost.author, 'I have no flair', '1')
-  			self.r.compose_message(topPost.author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
+  			#self.r.compose_message(topPost.author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
   		except:
   			print "There was an error(are you sure your mod?), continuing..."
   	else:
   		try:
   			self.r.get_subreddit(self.thesub).set_flair(topPost.author, topPost.author_flair_text, '1')
-  			self.r.compose_message(topPost.author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
+  			#self.r.compose_message(topPost.author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
   		except:
   			print "There was an error(are you sure your mod?), continuing..."
   	
@@ -70,13 +70,13 @@ class FridayFlair:
   	if topPost.comments_flat[0].author_flair_text==None:
   		try:
   			self.r.get_subreddit(self.thesub).set_flair(topPost.comments_flat[0].author, 'I have no flair', '2')
-  			self.r.compose_message(topPost.comments_flat[0].author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
+  			#self.r.compose_message(topPost.comments_flat[0].author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
 		except:
 			print "again you don't have mod access to this subreddit, thats cool no problem I'll just not set flair"
 	else:
 		try:
 			self.r.get_subreddit(self.thesub).set_flair(topPost.comments_flat[0].author, topPost.author_flair_text, '2')
-			self.r.compose_message(topPost.comments_flat[0].author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
+			#self.r.compose_message(topPost.comments_flat[0].author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
 		except:
 			print "again you don't have mod access to this subreddit, thats cool no problem I'll just not set flair"
     
@@ -121,8 +121,8 @@ class FridayFlair:
   	body+='**Top ten comments**\n\n'
   	body+=self.comments
   	if ans=='yes' or ans=='y' or ans=='YES' or ans=='Y':
-  		self.r.submit(self.thesub, '[Announcement] Friday Flair Awards', text=body)
-  		#self.r.submit('SaSModRoom', '(testing)[Announcement] Friday Flair Awards', text=body)
+  		#self.r.submit(self.thesub, '[Announcement] Friday Flair Awards', text=body)
+  		self.r.submit('SaSModRoom', '(testing)[Announcement] Friday Flair Awards', text=body)
 	else:
 		print "Ok cool I'll show it here than"
 		print body
