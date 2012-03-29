@@ -107,7 +107,7 @@ class FridayFlair:
 
 
       
-  #This will post it to the subreddit
+  #This will post it to the subreddit that was entered
   def postToSub(self):
     print 'done'
     ans=raw_input("OK. Done do you want to post to r/"+self.thesub+"?: ")
