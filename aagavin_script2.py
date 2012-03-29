@@ -40,9 +40,9 @@ class FridayFlair:
   def getTopPost(self):
   	#removes current gold and silver flair
   	item =self.thesub.flair_list()
-  		for i in item:
-  			if i['flair_css_class']=="1" or i['flair_css_class']=="2":
-  				self.r.get_subreddit(self.thesub).set_flair(i['user'], i['flair_text'], None)
+  	for i in item:
+  		if i['flair_css_class']=="1" or i['flair_css_class']=="2":
+  			self.r.get_subreddit(self.thesub).set_flair(i['user'], i['flair_text'], None)
   	
   	
   	#gets the top post of the week in the givin subreddit
