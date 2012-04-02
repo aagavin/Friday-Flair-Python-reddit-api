@@ -29,6 +29,7 @@ class FridayFlair:
     #self.thesub=self.r.get_subreddit(thesubreddityouwant)
     self.thesub=thesubreddityouwant
     self.topcomments=list()
+    self.winners=list()
     self.r.login(username,password)
     self.topweekpost=''
     self.topweekcomment=''
@@ -51,17 +52,9 @@ class FridayFlair:
     #Checks to see if the author of the post has flair
     #if not it gives the author a flair of "I have no flair"
     if topPost.author_flair_text==None:
-      try:
-        self.r.get_subreddit(self.thesub).set_flair(topPost.author, 'I have no flair', '1')
-        #self.r.compose_message(topPost.author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
-      except:
-        print "There was an error(are you sure your mod?), continuing..."
+			(self.winners).insert(0,[topPost.author,None,'1'])
     else:
-      try:
-        self.r.get_subreddit(self.thesub).set_flair(topPost.author, topPost.author_flair_text, '1')
-        #self.r.compose_message(topPost.author, 'Your a winner', 'You won the [r/shittyaskscience](http://www.reddit.com/r/shittyaskscience) flair award!')
-      except:
-        print "There was an error(are you sure your mod?), continuing..."
+			(self.winners).insert(0,[topPost.author,topPost.author_flair_text,'1'])
 
     #Checks to see if the author of the top comment has flair
     #if not it gives the author a flair of "I have no flair"
