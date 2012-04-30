@@ -23,6 +23,7 @@ from operator import itemgetter, attrgetter
 
 #class FridayFlair
 class FridayFlair:
+  
   '''yea let declair some variables '''
   def __init__(self,username, password, thesubreddityouwant):
     self.r=reddit.Reddit(user_agent='aagavin_script')
