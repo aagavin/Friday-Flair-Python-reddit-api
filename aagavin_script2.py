@@ -29,8 +29,8 @@ class FridayFlair:
     self.r=reddit.Reddit(user_agent='aagavin_script')
     #self.thesub=self.r.get_subreddit(thesubreddityouwant)
     self.thesub=thesubreddityouwant
-    self.topcomments=list()
-    self.winners=list()
+    self.topcomments = []
+    self.winners = []
     self.r.login(username,password)
     self.topweekpost=''
     self.topweekcomment=''

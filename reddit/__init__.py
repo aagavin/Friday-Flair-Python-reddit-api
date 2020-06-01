@@ -91,10 +91,7 @@ class Config(object):  # pylint: disable-msg=R0903
     def __init__(self, site_name):
         obj = dict(CONFIG.items(site_name))
         self._site_url = 'http://' + obj['domain']
-        if 'ssl_domain' in obj:
-            self._ssl_url = 'https://' + obj['ssl_domain']
-        else:
-            self._ssl_url = None
+        self._ssl_url = 'https://' + obj['ssl_domain'] if 'ssl_domain' in obj else None
         self.api_request_delay = float(obj['api_request_delay'])
         self.by_kind = {obj['comment_kind']:    reddit.objects.Comment,
                         obj['message_kind']:    reddit.objects.Message,
@@ -103,8 +100,8 @@ class Config(object):  # pylint: disable-msg=R0903
                         obj['submission_kind']: reddit.objects.Submission,
                         obj['subreddit_kind']:  reddit.objects.Subreddit,
                         obj['userlist_kind']:   reddit.objects.UserList}
-        self.by_object = dict((value, key) for (key, value) in
-                              self.by_kind.items())
+        self.by_object = {value: key for (key, value) in
+                                  self.by_kind.items()}
         self.by_object[reddit.objects.LoggedInRedditor] = obj['redditor_kind']
         self.cache_timeout = float(obj['cache_timeout'])
         self.comment_limit = int(obj['comment_limit'])
@@ -141,7 +138,7 @@ class BaseReddit(object):
         site name `reddit` will be used.
         """
 
-        if not user_agent or not isinstance(user_agent, str):
+        if not (user_agent and isinstance(user_agent, str)):
             raise TypeError('User agent must be a non-empty string.')
         self.DEFAULT_HEADERS['User-agent'] = user_agent
         self.config = Config(site_name or os.getenv('REDDIT_SITE') or 'reddit')
@@ -241,10 +238,7 @@ class BaseReddit(object):
         # While we still need to fetch more content to reach our limit, do so.
         while fetch_all or content_found < limit:
             page_data = self.request_json(page_url, url_data=url_data)
-            if root_field:
-                root = page_data[root_field]
-            else:
-                root = page_data
+            root = page_data[root_field] if root_field else page_data
             for thing in root[thing_field]:
                 yield thing
                 content_found += 1
@@ -275,10 +269,7 @@ class BaseReddit(object):
         if not page_url.endswith('.json'):
             page_url += '.json'
         response = self._request(page_url, params, url_data)
-        if as_objects:
-            hook = self._json_reddit_objecter
-        else:
-            hook = None
+        hook = self._json_reddit_objecter if as_objects else None
         return json.loads(response, object_hook=hook)
 
 
