@@ -34,20 +34,14 @@ class RedditContentObject(object):
         information from the API (only matters when it isn't provided using
         json_dict).
         """
-        if info_url:
-            self._info_url = info_url
-        else:
-            self._info_url = reddit_session.config['info']
+        self._info_url = info_url if info_url else reddit_session.config['info']
         self.reddit_session = reddit_session
         self._underscore_names = underscore_names
         self._populated = self._populate(json_dict, fetch)
 
     def _populate(self, json_dict, fetch):
         if json_dict is None:
-            if fetch:
-                json_dict = self._get_json_dict()
-            else:
-                json_dict = {}
+            json_dict = self._get_json_dict() if fetch else {}
         for name, value in json_dict.iteritems():
             if self._underscore_names and name in self._underscore_names:
                 name = '_' + name
@@ -62,13 +56,14 @@ class RedditContentObject(object):
                                                                  attr))
 
     def __setattr__(self, name, value):
-        if value and name == 'subreddit':
-            value = Subreddit(self.reddit_session, value, fetch=False)
-        elif value and name in ['redditor', 'author']:
-            if value == '[deleted]':
-                value = None
-            else:
-                value = Redditor(self.reddit_session, value, fetch=False)
+        if value:
+            if name == 'subreddit':
+                value = Subreddit(self.reddit_session, value, fetch=False)
+            elif name in ['redditor', 'author']:
+                if value == '[deleted]':
+                    value = None
+                else:
+                    value = Redditor(self.reddit_session, value, fetch=False)
         object.__setattr__(self, name, value)
 
     def __eq__(self, other):
@@ -298,10 +293,7 @@ class Message(Inboxable):
     """A class for reddit messages (orangereds)."""
     def __init__(self, reddit_session, json_dict):
         super(Message, self).__init__(reddit_session, json_dict)
-        if self.replies:
-            self.replies = self.replies['data']['children']
-        else:
-            self.replies = []
+        self.replies = self.replies['data']['children'] if self.replies else []
 
     @limit_chars()
     def __str__(self):
@@ -509,7 +501,7 @@ class Submission(Approvable, Deletable, Distinguishable, Reportable, Saveable,
             remaining = None
         skipped = []
 
-        while len(queue) > 0:
+        while queue:
             parent, comm = queue.pop(0)
             if isinstance(comm, MoreComments):
                 if parent:
@@ -556,7 +548,7 @@ class Submission(Approvable, Deletable, Distinguishable, Reportable, Saveable,
 
     @property
     def comments(self):  # pylint: disable-msg=E0202
-        if self._comments == None:
+        if self._comments is None:
             self.comments = Submission.get_info(self.reddit_session,
                                                 self.permalink,
                                                 comments_only=True)

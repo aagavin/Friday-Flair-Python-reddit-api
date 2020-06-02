@@ -110,9 +110,9 @@ def parse_api_json_response(func):  # pylint: disable-msg=R0912
     def error_checked_func(self, *args, **kwargs):
         return_value = func(self, *args, **kwargs)
         if isinstance(return_value, dict):
+            allowed = ('captcha', 'data', 'errors', 'kind', 'names',
+                       'next', 'prev', 'users')
             for k in return_value:
-                allowed = ('captcha', 'data', 'errors', 'kind', 'names',
-                           'next', 'prev', 'users')
                 if k not in allowed:
                     warnings.warn_explicit('Unknown return value key: %s' % k,
                                            UserWarning, '', 0)

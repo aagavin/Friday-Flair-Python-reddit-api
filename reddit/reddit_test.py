@@ -33,10 +33,10 @@ USER_AGENT = 'reddit_api test suite %s' % VERSION
 def flair_diff(root, other):
     """Function for comparing two flairlists supporting optional arguments."""
     keys = [u'user', u'flair_text', u'flair_css_class']
-    root_items = set(tuple(item[key] if key in item and item[key] else u'' for
-                           key in keys) for item in root)
-    other_items = set(tuple(item[key] if key in item and item[key] else u'' for
-                            key in keys) for item in other)
+    root_items = {tuple(item[key] if key in item and item[key] else u'' for
+                               key in keys) for item in root}
+    other_items = {tuple(item[key] if key in item and item[key] else u'' for
+                                key in keys) for item in other}
     return list(root_items - other_items)
 
 
@@ -154,10 +154,10 @@ class MoreCommentsTest(unittest.TestCase, AuthenticatedHelper):
         self.configure()
         if self.r.config.is_reddit:
             url = self.url('/r/photography/comments/pozpi/')
-            self.submission = self.r.get_submission(url=url)
         else:
             url = self.url('/r/reddit_test9/comments/1a/')
-            self.submission = self.r.get_submission(url=url)
+
+        self.submission = self.r.get_submission(url=url)
 
     def test_all_comments(self):
         c_len = len(self.submission.comments)
@@ -563,7 +563,7 @@ class SubmissionTest(unittest.TestCase, AuthenticatedHelper):
         for submission in self.r.user.get_submitted():
             if submission.saved:
                 break
-        if not submission or not submission.saved:
+        if not (submission and submission.saved):
             self.fail('Could not find saved submission.')
         submission.unsave()
         # reload the submission
